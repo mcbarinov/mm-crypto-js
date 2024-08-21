@@ -1,12 +1,12 @@
-FROM node:22.1 as builder
+FROM node:22.6 as builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY src/ .
+COPY src/ ./src
 COPY tsconfig.json .
 RUN npm run build
 
-FROM node:22.1-slim
+FROM node:22.6-slim
 ENV NODE_ENV production
 USER node
 WORKDIR /app
@@ -14,4 +14,4 @@ COPY package*.json ./
 RUN npm ci --omit-dev
 COPY --from=builder /app/dist ./dist
 EXPOSE 3000
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "dist/src/index.js" ]

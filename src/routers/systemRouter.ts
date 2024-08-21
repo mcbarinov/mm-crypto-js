@@ -1,7 +1,8 @@
-import { readPackageSync } from "read-pkg"
+import pkg from "../../package.json"
+
 import { Hono } from "hono"
 
-const appVersion = readPackageSync().version
+const appVersion = pkg.version
 
 const router = new Hono()
 
