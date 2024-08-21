@@ -1,0 +1,44 @@
+---
+- name: Prepare /app files
+  block:
+    - name: Create /app dir
+      ansible.builtin.file:
+        path: /app
+        state: directory
+        mode: "700"
+    - name: Copy docker-compose.yml
+      ansible.builtin.copy:
+        src: docker-compose.yml
+        dest: /app/docker-compose.yml
+        mode: "600"
+    - name: Copy Caddyfile
+      ansible.builtin.copy:
+        src: Caddyfile
+        dest: /app/Caddyfile
+        mode: "600"
+    - name: Copy .env
+      ansible.builtin.template:
+        src: .env.j2
+        dest: /app/.env
+        mode: "600"
+
+#- name: Login to the docker registry
+#  community.docker.docker_login:
+#    registry: "{{ docker_registry }}"
+#    username: "{{ docker_username }}"
+#    password: "{{ docker_password }}"
+
+- name: Pull the app docker image
+  community.docker.docker_image:
+    name: "{{ app_image }}:{{ app_version }}"
+    source: pull
+    force_source: true
+
+- name: Tear down existing services
+  community.docker.docker_compose_v2:
+    project_src: /app
+    state: absent
+
+- name: Create and start services
+  community.docker.docker_compose_v2:
+    project_src: /app

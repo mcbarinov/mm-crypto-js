@@ -1,0 +1,40 @@
+services:
+  app:
+    container_name: app
+    image: ${APP_IMAGE}:${APP_VERSION}
+    restart: always
+    environment:
+      - APP_NAME=${APP_NAME}
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+    volumes:
+      - app:/data
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+
+  caddy:
+    container_name: caddy
+    image: caddy:2.7.6-alpine
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN=${DOMAIN}
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+
+volumes:
+  app:
+  caddy_data:
+  caddy_config:

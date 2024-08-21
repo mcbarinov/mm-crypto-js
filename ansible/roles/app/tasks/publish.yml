@@ -1,0 +1,17 @@
+---
+- name: Check that 'app_version' var is set
+  ansible.builtin.assert:
+    that: app_version is defined
+    fail_msg: "app_version is not set! Usage: ansible-playbook -e app_version=1.2.0 playbook.yml"
+
+- name: Check that /app/docker-compose.yml exists
+  ansible.builtin.stat:
+    path: /app/docker-compose.yml
+  register: result
+
+- name: Install host
+  ansible.builtin.include_tasks: inc/install_host.yml
+  when: not result.stat.exists
+
+- name: Update app
+  ansible.builtin.include_tasks: inc/update_app.yml

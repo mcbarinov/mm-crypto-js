@@ -1,0 +1,7 @@
+services:
+  app:
+    image: mm-crypto-js:latest
+    environment:
+      - ACCESS_TOKEN=docker-secret
+    ports:
+      - 3000:3000

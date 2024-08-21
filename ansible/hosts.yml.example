@@ -1,0 +1,16 @@
+servers:
+  hosts:
+    "mm-crypto-js.example.net":
+      app_name: mm-crypto-js
+      domain: mm-crypto-js.example.net
+      app_image: ghcr.io/xxx/mm-crypto-js
+      access_token: secret
+      letsencrypt_email: mail@spam.org
+
+  vars:
+    docker_registry: ghcr.io
+    docker_username: xxx
+    docker_password: secret
+    authorized_keys: |
+      ssh-ed25519 ********************* usr1
+      ssh-ed25519 ********************* usr2

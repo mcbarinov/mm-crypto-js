@@ -1,0 +1,5 @@
+- name: Publish the app
+  ansible.builtin.import_tasks: publish.yml
+  tags:
+    - publish
+    - never

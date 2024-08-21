@@ -1,0 +1,6 @@
+---
+- name: Manage mm-crypto-js
+  hosts: servers
+  gather_facts: false
+  roles:
+    - role: app

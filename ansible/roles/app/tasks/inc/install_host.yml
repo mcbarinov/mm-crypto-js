@@ -1,0 +1,68 @@
+---
+- name: Gather facts
+  ansible.builtin.gather_facts:
+
+- name: Login with known ssh keys only
+  block:
+    - name: Create /root/.ssh dir
+      ansible.builtin.file:
+        path: /root/.ssh
+        state: directory
+        mode: "700"
+
+    - name: Set only known ssh keys
+      ansible.builtin.copy:
+        dest: /root/.ssh/authorized_keys
+        content: "{{ authorized_keys }}"
+        mode: "600"
+
+    - name: Enable root login over SSH
+      ansible.builtin.lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin yes"
+        state: present
+
+    - name: Disable password login
+      ansible.builtin.lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+        state: present
+
+    - name: Restart ssh.service
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+
+
+- name: Set UTC timezone
+  community.general.timezone:
+    name: UTC
+
+- name: Upgrade apt packages
+  ansible.builtin.apt:
+    upgrade: true
+    update_cache: true
+    cache_valid_time: 86400 # 1 day
+
+- name: Install docker
+  block:
+    - name: Add docker GPG apt key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add docker apt repository
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+    - name: Install docker packages
+      ansible.builtin.apt:
+        state: latest
+        update_cache: true
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
